@@ -9,10 +9,8 @@
 
 using namespace std;
 
-void matchDescriptors(cv::Mat &imgSource, cv::Mat &imgRef, 
-                      vector<cv::KeyPoint> &kPtsSource, vector<cv::KeyPoint> &kPtsRef, 
-                      cv::Mat &descSource, cv::Mat &descRef,
-                      vector<cv::DMatch> &matches, string descriptorType, string matcherType, string selectorType)
+void matchDescriptors(cv::Mat &imgSource, cv::Mat &imgRef, vector<cv::KeyPoint> &kPtsSource, vector<cv::KeyPoint> &kPtsRef, 
+                      cv::Mat &descSource, cv::Mat &descRef, vector<cv::DMatch> &matches, string descriptorType, string matcherType, string selectorType)
 {
 
     // configure matcher
@@ -36,9 +34,6 @@ void matchDescriptors(cv::Mat &imgSource, cv::Mat &imgRef,
 
         //... TODO : implement FLANN matching
         cout << "FLANN matching";
-
-        matcher = cv::DescriptorMatcher::create(cv::DescriptorMatcher::FLANNBASED);
-        
     }
 
     // perform matching task
@@ -54,32 +49,14 @@ void matchDescriptors(cv::Mat &imgSource, cv::Mat &imgRef,
     { // k nearest neighbors (k=2)
 
         // TODO : implement k-nearest-neighbor matching
-        std::vector< std::vector<cv::DMatch> > knn_matches;
-        double t = (double)cv::getTickCount();
-        matcher->knnMatch(descSource, descRef, knn_matches, 2); // finds the 2 best matches
-        t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
-        cout << " (KNN) with n=" << knn_matches.size() << " matches in " << 1000 * t / 1.0 << " ms" << endl;
 
         // TODO : filter matches using descriptor distance ratio test
-        const float ratio_thresh = 0.8f;
-        std::vector<cv::DMatch> good_matches;
-        for (size_t i = 0; i < knn_matches.size(); i++)
-        {
-            if (knn_matches[i][0].distance < ratio_thresh * knn_matches[i][1].distance)
-            {
-                good_matches.push_back(knn_matches[i][0]);
-            }
-        }
-        matches = good_matches;
-        cout << "# keypoints removed = " << knn_matches.size() - matches.size() << endl;
     }
 
     // visualize results
     cv::Mat matchImg = imgRef.clone();
-    cv::drawMatches(imgSource, kPtsSource, imgRef, kPtsRef, matches,
-                    matchImg, cv::Scalar::all(-1), 
-                    cv::Scalar::all(-1), vector<char>(), 
-                    cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+    cv::drawMatches(imgSource, kPtsSource, imgRef, kPtsRef, matches, matchImg, cv::Scalar::all(-1), 
+                    cv::Scalar::all(-1), vector<char>(), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 
     string windowName = "Matching keypoints between two camera images (best 50)";
     cv::namedWindow(windowName, 7);
